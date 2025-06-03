@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Chat;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,13 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('chats', function (Blueprint $table) {
+        Schema::create('chat_user', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->nullable();
-            $table->text('description')->nullable();
-            $table->json('settings')->nullable();
-            $table->foreignIdFor(User::class)->constrained("users")->cascadeOnDelete();
-            $table->foreignIdFor(File::class)->constrained("files")->cascadeOnDelete();
+            $table->foreignIdFor(User::class)->constrained('users')->cascadeOnDelete();
+            $table->foreignIdFor(Chat::class)->constrained('chats')->cascadeOnDelete();
+            $table->string('role');
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('chats');
+        Schema::dropIfExists('chat_user');
     }
 };

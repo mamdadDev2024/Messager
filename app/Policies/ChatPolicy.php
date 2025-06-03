@@ -9,27 +9,11 @@ use Illuminate\Auth\Access\Response;
 class ChatPolicy
 {
     /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
-    {
-        return false;
-    }
-
-    /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, Chat $chat): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        return false;
+        return $chat->isVisibleTo($user);
     }
 
     /**
@@ -37,7 +21,7 @@ class ChatPolicy
      */
     public function update(User $user, Chat $chat): bool
     {
-        return false;
+        return $chat->isOwn($user);
     }
 
     /**
@@ -45,7 +29,7 @@ class ChatPolicy
      */
     public function delete(User $user, Chat $chat): bool
     {
-        return false;
+        return $chat->isOwn($user);
     }
 
     /**
@@ -53,7 +37,7 @@ class ChatPolicy
      */
     public function restore(User $user, Chat $chat): bool
     {
-        return false;
+        return $chat->isOwn($user);
     }
 
     /**
