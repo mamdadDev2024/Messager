@@ -17,7 +17,9 @@ class ChatFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'title' => $this->faker->sentence,
+            'description' => $this->faker->paragraphs(3, true),
+            'type'
         ];
     }
 }
