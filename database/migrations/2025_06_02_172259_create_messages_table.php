@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Chat;
+use App\Models\File;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,7 +19,7 @@ return new class extends Migration
             $table->text('text')->nullable();
             $table->foreignIdFor(User::class)->constrained('users')->cascadeOnDelete();
             $table->foreignIdFor(Chat::class)->constrained('chats')->cascadeOnDelete();
-            $table->foreignIdFor(User::class)->constrained('files')->cascadeOnDelete();
+            $table->foreignIdFor(File::class)->constrained('files')->cascadeOnDelete();
             $table->softDeletes();
             $table->timestamps();
         });

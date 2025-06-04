@@ -40,4 +40,9 @@ class Message extends Model
     {
         return $this->file->type == 'image';
     }
+
+    public function isOwn(User $user)
+    {
+        return $this->id == $user->id;
+    }
 }

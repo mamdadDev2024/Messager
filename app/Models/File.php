@@ -17,13 +17,4 @@ class File extends Model
         'url',
         'file_name'
     ];
-    public static function booted()
-    {
-        static::deleting(function ($file) {
-            $publicPath = public_path($file->url);
-            if (file_exists($publicPath)) {
-                unlink(asset($file->url));
-            }
-        });
-    }
 }

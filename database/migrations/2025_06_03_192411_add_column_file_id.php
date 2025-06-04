@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\File;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,13 +12,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('files', function (Blueprint $table) {
-            $table->id();
-            $table->text('url');
-            $table->unsignedBigInteger('size');
-            $table->string('file_name');
-            $table->type('size');
-            $table->timestamps();
+        Schema::table('users' , function (Blueprint $table){
+            $table->foreignIdFor(File::class)->constrained()->cascadeOnDelete();
         });
     }
 
@@ -26,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('files');
+        Schema::dropColumns('users' , 'file_id');
     }
 };
