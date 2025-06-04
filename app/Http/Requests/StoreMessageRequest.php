@@ -11,7 +11,7 @@ class StoreMessageRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -22,7 +22,9 @@ class StoreMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'text' => 'required|string',
+            'file' => 'nullable|file|max:10000',
+            'chat_id' => 'required|exists:chats,id'
         ];
     }
 }

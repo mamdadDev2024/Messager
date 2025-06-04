@@ -11,7 +11,7 @@ class StoreChatRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -22,7 +22,9 @@ class StoreChatRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => 'required|string|max:100',
+            'decription' => 'required|string|max:500',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:10000',
         ];
     }
 }
