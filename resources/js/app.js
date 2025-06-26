@@ -1,73 +1,129 @@
-
 import './bootstrap';
 
 class ChannelManager {
-  constructor(parameters = {}) {
-    this.chatId = parameters.id;
-    this.user = parameters.user;
-    this.messageBox = document.querySelector(parameters.messageBoxId);
-    this.input = document.querySelector(parameters.inputId);
-    this.button = document.querySelector(parameters.buttonId);
-    this.userBox = document.querySelector(parameters.userBoxId);
-    this.channel = window.Echo.channel('chat.' + this.chatId);
-    this.listener_init();
-  }
+    constructor({ id, user, messageBoxId, inputId, buttonId, userBoxId, fileInputId }) {
+        this.chatId = id;
+        this.user = user;
+        this.messageBox = document.querySelector(messageBoxId);
+        this.input = document.querySelector(inputId);
+        this.button = document.querySelector(buttonId);
+        this.userBox = document.querySelector(userBoxId);
+        this.fileInput = document.querySelector(fileInputId);
 
-  listener_init() {
-    this.channel
-      .listen('MessageSent', (e) => this.handleReceiveMessage(e.message))
-      .listenForWhisper('typing', (e) => this.handleTyping(e))
-      .here(this._handle_online_users.bind(this))
-      .joining(this._handle_join_user.bind(this))
-      .error(this._handle_error.bind(this));
+        if (!this.messageBox || !this.input || !this.button || !this.userBox || !this.fileInput) {
+            console.error("برخی از المنت‌های DOM پیدا نشدند.");
+            return;
+        }
 
-    this.input.addEventListener('keydown', (e) => this.handleTyping(e));
-    this.button.addEventListener('click', (e) => this.handleSendMessage(e));
+        this.channel = window.Echo.join('chat.' + this.chatId);
 
-    document.addEventListener('livewire:init', () => {
-    });
-  }
+        this._initListeners();
+    }
 
-  _handle_join_user(user) {
-    console.log('User joined:', user);
-  }
+    _initListeners() {
+        this.channel.listen('.MessageSent', e => this._handleReceiveMessage(e));
+        this.channel.listenForWhisper('typing', e => this._handleTyping(e));
 
-  _handle_online_users(users) {
-    console.log('Online users:', users);
-  }
+        this.channel
+            .here(users => this._setOnlineUsers(users))
+            .joining(user => this._addUser(user))
+            .leaving(user => this._removeUser(user));
 
-  handleTyping(event) {
-    if (event.type === 'keydown' && event.key !== 'Enter') return;
-    this.channel.whisper('typing', { id: this.user.id });
-  }
+        this.input.addEventListener('input', () => this._sendTyping());
+        this.button.addEventListener('click', () => this._handleSend());
+    }
 
-  handleSendMessage(event) {
-    const message = this.input.value;
-    Livewire.emit('sendMessage', message, this.chatId);
-    this.input.value = '';
-  }
+    _handleSend() {
+        const text = this.input.value.trim();
+        const file = this.fileInput.files[0];
 
-  handleReceiveMessage(message) {
-    this._add_message_el_to_messagebox(message);
-  }
+        if (!text && !file) return;
 
-  handleTyping(e) {
-    this._add_user_to_userbox(e.id);
-  }
+        if (file && file.size > 10 * 1024 * 1024) {
+            alert("فایل نباید بیشتر از ۱۰ مگابایت باشد.");
+            return;
+        }
 
-  _add_message_el_to_messagebox(message) {
-    const p = document.createElement('p');
-    p.innerText = message.text;
-    this.messageBox.appendChild(p);
-  }
+        const formData = new FormData();
+        formData.append('chat_id', this.chatId);
+        formData.append('text', text);
+        if (file) formData.append('file', file);
 
-  _add_user_to_userbox(id) {
-    const div = document.createElement('div');
-    div.innerText = `User ${id} is typing...`;
-    this.userBox.appendChild(div);
-  }
+        this.button.disabled = true;
+        window.axios.post(`/chat/${this.chatId}/message`, formData)
+            .then(() => {
+                this.input.value = '';
+                this.fileInput.value = '';
+            })
+            .catch(err => console.error('ارسال پیام با خطا مواجه شد:', err))
+            .finally(() => {
+                this.button.disabled = false;
+            });
+    }
 
-  _handle_error(error) {
-    console.error('Error:', error);
-  }
+    _handleReceiveMessage(e) {
+        const message = e.message ?? e;
+        if (!message?.user) return console.error('پیام نامعتبر:', message);
+
+        const isMe = message.user.id === this.user.id;
+
+        const el = document.createElement('div');
+        el.className = `flex flex-col p-2 my-2 rounded shadow text-sm w-fit max-w-xs ${isMe ? 'bg-green-100 self-end' : 'bg-blue-100 self-start'}`;
+
+        el.innerHTML = `
+            <div class="font-bold text-gray-700">${message.user.name}</div>
+            <div>${message.text || ''}</div>
+            ${message.file ? `<a href="${message.file.url}" target="_blank" class="text-blue-500 underline">دانلود فایل</a>` : ''}
+            <div class="text-gray-400 text-xs text-end">${message.created_at}</div>
+        `;
+
+        this.messageBox.appendChild(el);
+        this.messageBox.scrollTop = this.messageBox.scrollHeight;
+    }
+
+    _sendTyping() {
+        this.channel.whisper('typing', { id: this.user.id });
+    }
+
+    _handleTyping(e) {
+        const el = this.userBox.querySelector(`[data-user-id="${e.id}"]`);
+        if (!el) return;
+
+        const status = el.querySelector('[data-status]');
+        status.textContent = 'در حال نوشتن...';
+        clearTimeout(el.typingTimeout);
+        el.typingTimeout = setTimeout(() => {
+            status.textContent = 'آنلاین';
+        }, 3000);
+    }
+
+    _setOnlineUsers(users) {
+        this.userBox.innerHTML = '';
+        users.forEach(user => this._addUser(user));
+    }
+
+    _addUser(user) {
+        if (this.userBox.querySelector(`[data-user-id="${user.id}"]`)) return;
+
+        const el = document.createElement('div');
+        el.className = 'flex items-center gap-2 p-1';
+        el.setAttribute('data-user-id', user.id);
+
+        el.innerHTML = `
+            <img src="${user.avatar}" class="w-6 h-6 rounded-full" />
+            <div>
+                <div class="font-medium text-sm">${user.username}</div>
+                <div class="text-xs text-green-500" data-status>آنلاین</div>
+            </div>
+        `;
+
+        this.userBox.appendChild(el);
+    }
+
+    _removeUser(user) {
+        const el = this.userBox.querySelector(`[data-user-id="${user.id}"]`);
+        if (el) el.remove();
+    }
 }
+
+window.ChannelManager = ChannelManager;

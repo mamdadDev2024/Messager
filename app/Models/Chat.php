@@ -12,14 +12,11 @@ class Chat extends Model
 
     protected $fillable = [
         'title',
-        'description',
-        'settings',
-        'user_id'
+        'user_id',
+        'file_id',
+        'type'
     ];
 
-    protected $casts = [
-        'settings'=> 'array'
-    ];
     public function owner()
     {
         return $this->belongsTo(User::class);

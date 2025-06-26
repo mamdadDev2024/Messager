@@ -10,8 +10,8 @@ class Home extends Component
 
     public function mount()
     {
-    $this->chats = auth()->user()->chats()
-        ->with(['owner', 'messages', 'image' , 'latestMessage'])
+    $this->chats = auth()->user()->ownedChats()
+        ->with(['owner', 'image' , 'latestMessage'])
         ->withCount(['messages'])
         ->get()
         ->toArray();

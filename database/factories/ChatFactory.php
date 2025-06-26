@@ -16,8 +16,13 @@ class ChatFactory extends Factory
      */
     public function definition(): array
     {
+        $types = [
+            'single',
+            'group'
+        ];
         return [
             'title' => $this->faker->sentence,
+            'type' => $types[rand(0,1)]
         ];
     }
 }

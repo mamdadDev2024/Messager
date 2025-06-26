@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users' , function (Blueprint $table){
-            $table->foreignIdFor(File::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(File::class , 'avatar_id')->nullable()->constrained()->cascadeOnDelete();
         });
     }
 

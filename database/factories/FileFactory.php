@@ -16,8 +16,16 @@ class FileFactory extends Factory
      */
     public function definition(): array
     {
+        $types = [
+            'image',
+            'video',
+            'document'
+        ];
         return [
-            //
+            'url' => $this->faker->url,
+            'file_name' => $this->faker->name,
+            'size' => $this->faker->numberBetween(1000 , 3000),
+            'type' => $types[rand(0, count($types) -1)]
         ];
     }
 }

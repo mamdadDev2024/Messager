@@ -12,9 +12,11 @@ class File extends Model
     use HasFactory , Prunable;
 
     protected $fillable = [
-        'type',
-        'size',
         'url',
-        'file_name'
+        'size',
+        'file_name',
+        'type',
+        'user_id',
+        'visible'
     ];
 }

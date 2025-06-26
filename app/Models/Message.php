@@ -26,7 +26,7 @@ class Message extends Model
         return $this->belongsTo(Chat::class);
     }
 
-    public function file()
+    public function attachment()
     {
         return $this->belongsTo(File::class);
     }

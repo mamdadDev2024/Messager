@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MessageSaveController;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Chat\Show;
@@ -20,4 +21,5 @@ Route::prefix('auth')->group(function () {
 
 Route::as('chat.')->prefix('chat')->middleware('auth')->group(function () {
     Route::get('{Chat}' , Show::class)->name('show');
+    Route::post('{Chat}/message' , [MessageSaveController::class , 'save'])->name('message.save');
 });

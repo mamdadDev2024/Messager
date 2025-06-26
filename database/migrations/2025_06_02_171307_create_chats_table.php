@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('title')->nullable();
             $table->string('type')->default('single');
             $table->foreignIdFor(User::class)->nullable()->constrained("users")->cascadeOnDelete();
-            $table->foreignIdFor(File::class)->constrained("files")->cascadeOnDelete();
+            $table->foreignIdFor(File::class , 'image_id')->nullable()->constrained("files")->cascadeOnDelete();
             $table->timestamps();
         });
     }
