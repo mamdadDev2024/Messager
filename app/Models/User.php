@@ -18,7 +18,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'username',
         'email',
         'password',
     ];
@@ -51,9 +51,18 @@ class User extends Authenticatable
         return $this->hasMany(Message::class);
     }
 
+    public function hasRole(string $role, Chat $chat): bool
+    {
+        $pivot = $this->chats()->where('chat_id', $chat->id)->first()->pivot ?? null;
+        return $pivot && $pivot->role === $role;
+    }
     public function chats()
     {
-        return $this->hasMany(Chat::class);    
+        return $this->belongsToMany(Chat::class);
+    }
+    public function ownedChats()
+    {
+        return $this->hasMany(Chat::class);
     }
 
     public function avatar()

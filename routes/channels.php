@@ -3,8 +3,8 @@
 use App\Models\Chat;
 use Illuminate\Support\Facades\Broadcast;
 
-Broadcast::channel('chat/{type}/{id}', fn ($type, $id) =>
-    Chat::where('id', '=' , $id , 'and' , 'type' , $type)->first()->exists()
+Broadcast::channel('chat/{id}', fn ($id) =>
+    Chat::where('id', '=' , $id)->first()->exists()
 );
 
 

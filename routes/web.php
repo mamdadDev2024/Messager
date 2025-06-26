@@ -1,26 +1,23 @@
 <?php
 
-use App\Http\Controllers\ChatController;
+use App\Livewire\Auth\Login;
+use App\Livewire\Auth\Register;
+use App\Livewire\Chat\Show;
+use App\Livewire\Home;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () =>
-    view('welcome')
-);
+Route::get("/", Home::class)->middleware('auth')->name('home');
 
+Route::prefix('auth')->group(function () {
+    Route::get('login', Login::class)->name('login');
+    Route::get('register', Register::class)->name('register');
+    Route::post('logout', function (){
+        Auth::logout();
+        return redirect()->route('home');
+    })->middleware('auth')->name('logout');
+});
 
-Route::as('chat.')->prefix('chat')->group(function () {
-    
-    Route::as('group.')->prefix('g')->group(function() { 
-        Route::get('create' , [ChatController::class,'create'])->name('create');
-        Route::post('delete' , [ChatController::class,'create'])->name('delete');
-        Route::put('update/{Chat}' , [ChatController::class,'create'])->name('update');
-        Route::get('{Chat}' , [ChatController::class,'create'])->name('show');
-    });
-
-    Route::as('channel.')->prefix('c')->group(function() {
-        Route::get('create' , [ChatController::class,'create'])->name('create');
-        Route::post('delete' , [ChatController::class,'create'])->name('delete');
-        Route::put('update/{Chat}' , [ChatController::class,'create'])->name('update');
-        Route::get('{Chat}' , [ChatController::class,'create'])->name('show');
-    });
+Route::as('chat.')->prefix('chat')->middleware('auth')->group(function () {
+    Route::get('{Chat}' , Show::class)->name('show');
 });

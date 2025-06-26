@@ -33,14 +33,19 @@ class Chat extends Model
     {
         return $this->hasMany(Message::class);
     }
-    
+
+    public function latestMessage()
+    {
+        return $this->hasOne(Message::class)->latestOfMany();
+    }
+
     public function image()
     {
         return $this->belongsTo(File::class);
     }
     public function isVisibleTo(User $user)
     {
-        return $this->user_id === $user->id || 
+        return $this->user_id === $user->id ||
             $this->subscribers()->where('user_id', $user->id)->exists();
     }
     public function isOwn(User $user)

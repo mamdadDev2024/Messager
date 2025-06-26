@@ -16,10 +16,10 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->text('text')->nullable();
-            $table->foreignIdFor(User::class)->constrained('users')->cascadeOnDelete();
+            $table->text('context');
             $table->foreignIdFor(Chat::class)->constrained('chats')->cascadeOnDelete();
             $table->foreignIdFor(File::class)->constrained('files')->cascadeOnDelete();
+            $table->foreignIdFor(User::class)->constrained('users')->cascadeOnDelete();
             $table->softDeletes();
             $table->timestamps();
         });

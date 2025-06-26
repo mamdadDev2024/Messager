@@ -33,7 +33,7 @@ class Message extends Model
 
     public function hasFile()
     {
-        return isset($this->file);       
+        return isset($this->file);
     }
 
     public function hasImage()

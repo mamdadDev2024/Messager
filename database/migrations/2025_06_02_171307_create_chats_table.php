@@ -16,9 +16,8 @@ return new class extends Migration
         Schema::create('chats', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
-            $table->text('description')->nullable();
-            $table->json('settings')->nullable();
-            $table->foreignIdFor(User::class)->constrained("users")->cascadeOnDelete();
+            $table->string('type')->default('single');
+            $table->foreignIdFor(User::class)->nullable()->constrained("users")->cascadeOnDelete();
             $table->foreignIdFor(File::class)->constrained("files")->cascadeOnDelete();
             $table->timestamps();
         });

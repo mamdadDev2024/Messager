@@ -18,8 +18,6 @@ class ChatFactory extends Factory
     {
         return [
             'title' => $this->faker->sentence,
-            'description' => $this->faker->paragraphs(3, true),
-            'type'
         ];
     }
 }
