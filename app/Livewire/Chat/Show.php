@@ -11,13 +11,18 @@ class Show extends Component
 
     public function mount(Chat $Chat)
     {
-        $this->chat = $Chat->with(['subscribers', 'image', 'owner', 'messages.attachment'])->first()->toArray();
+        $this->chat = $Chat->load([
+            'subscribers',
+            'image',
+            'owner',
+            'messages.attachment',
+            'messages.user'
+        ]);
+
     }
 
     public function render()
     {
-        return view('livewire.chat.show', [
-            'chat' => $this->chat,
-        ]);
+        return view('livewire.chat.show');
     }
 }

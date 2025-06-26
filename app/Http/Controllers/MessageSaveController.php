@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Events\MessageSent;
 use App\Http\Requests\MessageStoreRequest;
+use App\Models\File;
 use App\Models\Message;
+use Illuminate\Support\Facades\Storage;
 
 class MessageSaveController extends Controller
 {
@@ -19,9 +21,9 @@ class MessageSaveController extends Controller
         ]);
 
         if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('chat_files' , 'public');
+            $path = $request->file('file')->store('chat_files', 'public');
 
-            $message->attachment()->create([
+            $file = File::create([
                 'url' => $path,
                 'user_id' => auth()->id(),
                 'file_name' => $request->file('file')->getClientOriginalName(),
@@ -29,13 +31,11 @@ class MessageSaveController extends Controller
                 'type' => $request->file('file')->getMimeType(),
             ]);
 
-            $message->load('attachment');
+            $message->attachment_id = $file->id;
+            $message->save();
         }
-
-        $message->load('user');
-
-        broadcast(new MessageSent($message));
-
-        return response()->json($message);
+        $message->load(['attachment', 'user']);
+        event(new MessageSent($message));
+        return response()->json(['message' => $message]);
     }
 }

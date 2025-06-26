@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('size');
             $table->foreignIdFor(User::class)->constrained('users')->cascadeOnDelete();
             $table->string('file_name');
+            $table->boolean('processed')->default(false);
             $table->boolean('visible')->default(true);
             $table->string('type');
             $table->timestamps();

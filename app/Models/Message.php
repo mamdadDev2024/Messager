@@ -9,11 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Message extends Model
 {
-    /** @use HasFactory<\Database\Factories\MessageFactory> */
-    use HasFactory , Prunable , SoftDeletes;
+    use HasFactory, Prunable, SoftDeletes;
 
     protected $fillable = [
-        "text","user_id","chat_id","file_id","deleted_at"
+        "text", "user_id", "chat_id", "file_id", "attachment_id"
     ];
 
     public function user()
@@ -28,21 +27,21 @@ class Message extends Model
 
     public function attachment()
     {
-        return $this->belongsTo(File::class);
+        return $this->belongsTo(File::class, 'attachment_id');
     }
 
     public function hasFile()
     {
-        return isset($this->file);
+        return $this->attachment !== null;
     }
 
     public function hasImage()
     {
-        return $this->file->type == 'image';
+        return $this->attachment && $this->attachment->type === 'image';
     }
 
     public function isOwn(User $user)
     {
-        return $this->id == $user->id;
+        return $this->user_id == $user->id;
     }
 }

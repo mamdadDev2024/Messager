@@ -2,11 +2,13 @@
 
 namespace App\Listeners;
 
+use App\Events\ImageProcessed;
 use App\Events\MessageSent;
 use App\Models\File;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class MessageSaver implements ShouldQueue
@@ -15,37 +17,43 @@ class MessageSaver implements ShouldQueue
 
     public function handle(MessageSent $event): void
     {
-        $file = $event->message->attachment;
 
+        $file = File::find($event->message->attachment_id);
         if (!$file) return;
 
         if (!Str::startsWith($file->type, 'image/')) {
             return;
         }
+
         $filePath = public_path($file->url);
         if (!file_exists($filePath)) {
-            \Log::warning("فایل در storage یافت نشد", ['path' => $filePath]);
+            \Log::warning("file not found!", ['path' => $filePath]);
             return;
         }
 
+
         $fileContents = file_get_contents($filePath);
+
 
         $response = Http::attach(
             'file',
             $fileContents,
             $file->file_name,
             ['Content-Type' => $file->type]
-        )->post('http://localhost:5050/process-image');
+        )->post('http://127.0.0.1:5050/process-image');
 
         if ($response->successful()) {
-            $file->visible = json_encode($response->json())['prediction'];
+            $file->visible = $response->json()['prediction'];
+            $file->processed = true;
             $file->save();
+            event(new ImageProcessed($file));
         } else {
-            \Log::error('خطا در ارسال تصویر به API', [
+            \Log::error('error on sending image to API', [
                 'file_id' => $file->id,
                 'response' => $response->body(),
             ]);
         }
     }
+
 }
 

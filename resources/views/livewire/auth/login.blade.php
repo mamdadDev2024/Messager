@@ -13,7 +13,7 @@
             <span class=" p-2 bg-red-500 w-full h-14 rounded-2xl text-center items-center flex flex-col justify-center">{{$message}}</span>
         @enderror
     </div>
-    <x-element.button wire:loading.attr="disabled" wire:loading.class='opacity-50'>
+    <x-element.button wire:loading.attr="disabled" type='submit' wire:loading.class='opacity-50'>
         ورود
     </x-element.button>
 </form>
