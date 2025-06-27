@@ -12,34 +12,28 @@ use Illuminate\Queue\SerializesModels;
 class ImageProcessed implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+
     public $message;
-    /**
-     * Create a new event instance.
-     */
+
     public function __construct(public File $file)
     {
-        $this->message = $file->message;
-        \Log::info($this->message->chat_id);
+        $this->message = $file->message()->with(['attachment', 'chat'])->first();
+        if (!$this->message || !$this->message->chat) {
+            throw new \Exception("Message or related chat not found for File ID {$file->id}");
+        }
     }
 
     public function broadcastWith()
     {
-        $this->message->load('attachment');
-
         return [
-            'message' => $this->message
+            'message' => $this->message->toArray(),
         ];
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn(): array
     {
         return [
-            new PresenceChannel("chat.{$this->message->chat_id}"),
+            new PresenceChannel("chat.{$this->message->chat->id}"),
         ];
     }
 }

@@ -3,8 +3,6 @@
 namespace App\Livewire\Auth;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -20,7 +18,6 @@ class Login extends Component
 
     public function login()
     {
-        Toaster::success('sdfasf ');
         $data = $this->validate();
 
         if (Auth::attempt($data , true))

@@ -8,7 +8,6 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
 class MessageSent implements ShouldBroadcast
 {
@@ -18,7 +17,7 @@ class MessageSent implements ShouldBroadcast
 
     public function __construct(Message $message)
     {
-        $this->message = $message;
+        $this->message = $message->load(['user' , 'attachment' , 'chat']);
     }
 
     public function broadcastWith(): array
@@ -28,6 +27,6 @@ class MessageSent implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new PresenceChannel("chat.{$this->message->chat_id}");
+        return new PresenceChannel("chat.{$this->message->chat->id}");
     }
 }

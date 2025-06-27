@@ -46,7 +46,7 @@ class MessageSaver implements ShouldQueue
             $file->visible = $response->json()['prediction'];
             $file->processed = true;
             $file->save();
-            event(new ImageProcessed($file));
+            broadcast(new ImageProcessed($file));
         } else {
             \Log::error('error on sending image to API', [
                 'file_id' => $file->id,

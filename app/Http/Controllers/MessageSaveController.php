@@ -34,8 +34,8 @@ class MessageSaveController extends Controller
             $message->attachment_id = $file->id;
             $message->save();
         }
+        broadcast(new MessageSent($message))->toOthers();
         $message->load(['attachment', 'user']);
-        event(new MessageSent($message));
         return response()->json(['message' => $message]);
     }
 }
