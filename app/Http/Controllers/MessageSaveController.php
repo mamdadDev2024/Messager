@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class MessageSaveController extends Controller
 {
-    public function save(MessageStoreRequest $request)
+    public function __invoke(MessageStoreRequest $request)
     {
         $data = $request->validated();
 
@@ -34,7 +34,7 @@ class MessageSaveController extends Controller
             $message->attachment_id = $file->id;
             $message->save();
         }
-        broadcast(new MessageSent($message))->toOthers();
+        broadcast(new MessageSent($message));
         $message->load(['attachment', 'user']);
         return response()->json(['message' => $message]);
     }

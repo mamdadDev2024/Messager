@@ -40,7 +40,7 @@ class MessageSaver implements ShouldQueue
             $fileContents,
             $file->file_name,
             ['Content-Type' => $file->type]
-        )->post('http://127.0.0.1:5050/process-image');
+        )->post(env('FLASK_URL').'process-image');
 
         if ($response->successful()) {
             $file->visible = $response->json()['prediction'];

@@ -21,3 +21,48 @@
     font-family: 'vasir';
     src: url('../../public/vasir.woff');
 }
+
+    /* Fade In */
+    @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+    }
+    .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    /* Slide In Left */
+    @keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    }
+    .animate-slide-in-left {
+    animation: slideInLeft 0.5s ease-out forwards;
+    }
+
+    /* Slide In Right */
+    @keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    }
+    .animate-slide-in-right {
+    animation: slideInRight 0.5s ease-out forwards;
+    }
+
+    /* Optional: smooth scale up hover */
+    .hover-scale-up:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
+    }

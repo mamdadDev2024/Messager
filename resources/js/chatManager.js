@@ -17,25 +17,26 @@ class ChannelManager {
         }
 
         this.channel = window.Echo.join(`chat.${this.chatId}`);
-
-        this.scrollToBottom();
+        console.log(this.channel);
+        setTimeout(() => this.scrollToBottom(), 50);
         this._initListeners();
 
     }
 
     _initListeners() {
-        this.channel.listen('MessageSent', (e) => {
+        this.channel.listen('.MessageSent', (e) => {
             if (e.user.id != this.user.id) {
+                console.log(e)
                 this._handleReceiveMessage(e)
             }
         });
-        this.channel.listen('ImageProcessed', e => this._handleImageBlur(e));
+        this.channel.listen('.ImageProcessed', e => this._handleImageBlur(e));
         this.channel.listenForWhisper('typing', e => this._handleTyping(e));
 
         this.channel
             .here(users => this._setOnlineUsers(users))
-            .joining(user => this._addUser(user))
-            .leaving(user => this._removeUser(user));
+            .joining(user => this._updateUserStatus(user.id , 'آنلاین'))
+            .leaving(user => this._updateUserStatus(user.id , 'آفلاین'));
 
         this.input.addEventListener('input', () => this._sendTyping());
         this.button.addEventListener('click', () => this._handleSend());
@@ -75,12 +76,12 @@ class ChannelManager {
     _handleReceiveMessage(e) {
         const message = e.message || e;
         if (!message.user) return;
+        if (this.messageBox.querySelector(`[data-message-id="${message.id}"]`)) return;
         const isMe = message.user.id === this.user.id;
         const wrapper = document.createElement('div');
         wrapper.id = message.id;
-        wrapper.className = `flex flex-col p-3 my-2 rounded-lg shadow text-sm max-w-xs w-fit ${
-            isMe ? 'bg-green-100 self-end justify-end' : 'bg-blue-100 self-start justify-start'
-        }`;
+        wrapper.className = `max-w-2xl w-fit p-4 rounded-2xl shadow transition-all duration-300 transform animate-fade-in
+            ${ isMe ? 'ml-auto bg-green-50' : 'mr-auto bg-blue-50' }`;
 
         let fileHtml = '';
         if (message.attachment) {
@@ -102,12 +103,14 @@ class ChannelManager {
         }
 
         wrapper.innerHTML = `
-            <div class="font-bold text-gray-700">${message.user.username}</div>
+            <div class="flex items-center justify-between mb-2 gap-2 text-xs text-gray-500">
+                <span class="font-medium text-gray-700">${ message.user.username }</span>
+                <div class="text-[10px] text-gray-400 mt-1 text-end">${this._formatTime(message.created_at)}</div>
+            </div>
             ${fileHtml}
             <div>${message.text || ''}</div>
-            <div class="text-[10px] text-gray-400 mt-1 text-end">${this._formatTime(message.created_at)}</div>
         `;
-
+        wrapper.setAttribute('data-message-id', message.id);
         this.messageBox.appendChild(wrapper);
         this.scrollToBottom();
     }
@@ -132,7 +135,7 @@ class ChannelManager {
     }
 
     _handleTyping(e) {
-        this._updateUserStatus(e, 'درحال نوشتن...');
+        this._updateUserStatus({ id: e.id }, 'درحال نوشتن...');
     }
 
     _setOnlineUsers(users) {
@@ -173,12 +176,19 @@ class ChannelManager {
         const statusEl = el.querySelector('[data-status]');
         if (!statusEl) return;
 
-        statusEl.textContent = status;
+        if (statusEl.textContent !== status) {
+            statusEl.textContent = status;
+        }
 
         clearTimeout(el.typingTimeout);
-        el.typingTimeout = setTimeout(() => {
-            statusEl.textContent = 'آنلاین';
-        }, 3000);
+
+        if (status === 'درحال نوشتن...') {
+            el.typingTimeout = setTimeout(() => {
+                if (statusEl.textContent === 'درحال نوشتن...') {
+                    statusEl.textContent = 'آنلاین';
+                }
+            }, 3000);
+        }
     }
 
     _toggleButton(enabled) {

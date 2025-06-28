@@ -25,5 +25,5 @@ Route::as('chat.')->prefix('chat')->middleware('auth')->group(function () {
     Route::get('create' , CreateGroup::class)->name('create');
     Route::delete('leave' , LeaveChatController::class)->name('leave');
     Route::get('{Chat}' , Show::class)->name('show');
-    Route::post('{Chat}/message' , [MessageSaveController::class , 'save'])->name('message.save');
+    Route::post('{Chat}/message' , MessageSaveController::class)->name('message.save');
 });
