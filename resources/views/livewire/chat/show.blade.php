@@ -36,26 +36,26 @@
             class="max-w-2xl w-fit p-4 rounded-2xl shadow transition-all duration-300 transform animate-fade-in
             {{ $message->user_id === auth()->id() ? 'ml-auto bg-green-50' : 'mr-auto bg-blue-50' }}">
 
-          <div class="flex items-center gap-2 justify-between mb-2 text-xs text-gray-500">
-            <span class="font-medium text-gray-700">{{ $message->user->username }}</span>
-            <span class="text-[10px] text-gray-400 mt-1 text-end">{{ $message->created_at->format('H:i') }}</span>
-          </div>
+            <div class="flex items-center gap-2 justify-between mb-2 text-xs text-gray-500">
+                <span class="font-medium text-gray-700">{{ $message->user->username }}</span>
+                <span class="text-[10px] text-gray-400 mt-1 text-end">{{ $message->created_at->format('H:i') }}</span>
+            </div>
 
-          @if($message->attachment)
-            @php $type = $message->attachment->type; @endphp
-            @if(Str::startsWith($type, 'image/'))
-              <img src="{{ asset($message->attachment->url) }}"
-                   class="rounded-xl mb-3 max-h-60 w-full object-contain cursor-pointer hover:scale-105 transition-transform duration-200 {{ !$message->attachment->visible ? 'blur-sm' : '' }}"
-                   title="برای نمایش کلیک کنید"
-                   data-file-id="{{ $message->attachment->id }}" />
-            @else
-              <a href="{{ asset($message->attachment->url) }}"
-                 class="inline-block text-blue-600 underline mb-3 truncate"
-                 target="_blank">{{ $message->attachment->file_name }}</a>
+            @if($message->attachment)
+                @php $type = $message->attachment->type; @endphp
+                @if(Str::startsWith($type, 'image/'))
+                <img src="{{ asset($message->attachment->url) }}"
+                    class="rounded-xl mb-3 max-h-60 w-full object-contain cursor-pointer hover:scale-105 transition-transform duration-200 {{ !$message->attachment->visible ? 'blur-sm' : '' }}"
+                    title="برای نمایش کلیک کنید"
+                    data-file-id="{{ $message->attachment->id }}" />
+                @else
+                <a href="{{ asset($message->attachment->url) }}"
+                    class="inline-block text-blue-600 underline mb-3 truncate"
+                    target="_blank">{{ $message->attachment->file_name }}</a>
+                @endif
             @endif
-          @endif
 
-          <p class="text-base leading-relaxed text-gray-800 break-words">{{ $message->text }}</p>
+            <p class="text-base leading-relaxed text-gray-800 break-words">{{ $message->text }}</p>
         </div>
       @endforeach
     </main>
@@ -98,7 +98,7 @@
 @push('scripts')
 <script type="module">
     const manager = new window.ChannelManager({
-        id: @json($chat->id),
+        id: {{$chat->id}},
         user: @json(auth()->user()->load('avatar')),
         messageBoxId: '#message-box',
         inputId: '#message-input',

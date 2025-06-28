@@ -1,8 +1,9 @@
 <?php
 use App\Models\Chat;
+use App\Models\User;
 use Illuminate\Support\Facades\Broadcast;
 
-Broadcast::channel('chat.{chat}', function ($user, Chat $chat) {
+Broadcast::channel('chat.{chat}', function (User $user, Chat $chat) {
     $user->load('avatar');
 
     $isMember = $user->chats()->where('chats.id', $chat->id)->exists()

@@ -18,6 +18,7 @@ class MessageSent implements ShouldBroadcast
     public function __construct(Message $message)
     {
         $this->message = $message->load(['user' , 'attachment' , 'chat']);
+        \Log::info($this->message->toArray());
     }
 
     public function broadcastWith(): array

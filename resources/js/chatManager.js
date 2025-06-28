@@ -17,7 +17,6 @@ class ChannelManager {
         }
 
         this.channel = window.Echo.join(`chat.${this.chatId}`);
-        console.log(this.channel);
         setTimeout(() => this.scrollToBottom(), 50);
         this._initListeners();
 
@@ -89,15 +88,15 @@ class ChannelManager {
             if (message.attachment.type.startsWith('image/')) {
                 fileHtml = `
                     <img src="${fileUrl}"
-                        data-file-id="${message.attachment.id}"
-                        class="rounded mb-1 max-h-48 cursor-pointer"
-                        title="برای نمایش کلیک کنید"/>
+                        class="rounded-xl mb-3 max-h-60 w-full object-contain cursor-pointer hover:scale-105 transition-transform duration-200 {{ !$message->attachment->visible ? 'blur-sm' : '' }}"
+                        title="برای نمایش کلیک کنید"
+                        data-file-id="${message.attachment.id}" />
                 `;
             } else {
                 fileHtml = `
                     <a href="${fileUrl}"
-                       class="text-blue-200 underline block mb-1 truncate"
-                       target="_blank">${message.attachment.file_name}</a>
+                        class="inline-block text-blue-600 underline mb-3 truncate"
+                        target="_blank">${message.attachment.file_name}</a>
                 `;
             }
         }
@@ -135,6 +134,8 @@ class ChannelManager {
     }
 
     _handleTyping(e) {
+        console.log(e);
+
         this._updateUserStatus({ id: e.id }, 'درحال نوشتن...');
     }
 
@@ -153,6 +154,7 @@ class ChannelManager {
     }
 
     _addOrUpdateUser(user, status) {
+
         let el = this.userBox.querySelector(`[data-user-id="${user.id}"]`);
         if (el) el.remove();
 
